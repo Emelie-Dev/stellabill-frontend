@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import WalletPill from './WalletPill'
 import WalletConnectModal from './WalletConnectModal'
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Logo from './Branding/Logo';
+import { Menu, X, Rocket, Zap, BookOpen, MessageSquare, ChevronRight } from 'lucide-react';
 
 export default function LandingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -10,6 +11,12 @@ export default function LandingNavbar() {
   const [isConnected, setIsConnected] = useState(false)
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
   const [address] = useState("GABCDEFGHIJK1234567890ABCDEFGHIJK1234567890ABCDEXYZ9")
+  
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard') || 
+                      location.pathname.startsWith('/subscriptions') || 
+                      location.pathname.startsWith('/plans') ||
+                      location.pathname.startsWith('/settings');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,15 +26,17 @@ export default function LandingNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const handleConnectWallet = () => {
-    // Open the modal instead of immediately connecting
     setIsWalletModalOpen(true);
   }
 
   const handleFreighterConnect = () => {
-    // This will be called when Freighter successfully connects
     setIsConnected(true);
-    // You can add actual Freighter connection logic here later
     console.log("Freighter connected successfully");
   }
 
@@ -37,355 +46,182 @@ export default function LandingNavbar() {
 
   const handleSubscribe = () => {
     console.log("Subscribe with USDC clicked");
-    // Navigate to subscription page
   };
 
-  const navLinks = [
-    { label: "Product", href: "#product", isAnchor: true },
-    { label: "Pricing", href: "/pricing", isAnchor: false },
-    { label: "Docs", href: "#docs", isAnchor: true },
-    { label: "Contact", href: "#contact", isAnchor: true },
+  const navLinks = isDashboard ? [] : [
+    { label: "Product", href: "/#product", icon: <Zap size={16} /> },
+    { label: "Pricing", href: "/pricing", icon: <Rocket size={16} /> },
+    { label: "Docs", href: "/#docs", icon: <BookOpen size={16} /> },
+    { label: "Contact", href: "/#contact", icon: <MessageSquare size={16} /> },
   ];
 
   return (
     <>
       <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          background: "#0a0a0a",
-          borderBottom: isScrolled
-            ? "1px solid #1a1a1a"
-            : "1px solid transparent",
-          boxShadow: isScrolled
-            ? "0 4px 20px rgba(0, 0, 0, 0.5), 0 -2px 20px rgba(34, 211, 238, 0.1)"
-            : "0 -2px 20px rgba(34, 211, 238, 0.08)",
-          transition: "all 0.3s ease",
-        }}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
+          isScrolled 
+            ? "bg-black/80 backdrop-blur-md border-white/10 shadow-lg" 
+            : "bg-transparent border-transparent"
+        }`}
       >
-        <nav
-          style={{
-            maxWidth: "1280px",
-            margin: "0 auto",
-            padding: "0 1.5rem",
-            height: "72px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "2rem",
-          }}
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          {/* Left - Branding */}
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <Logo size="md" />
-          </Link>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-18 lg:h-20">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Link to="/" className="flex items-center group">
+                <Logo size="md" />
+              </Link>
+            </div>
 
-          {/* Center - Navigation Links (Desktop) */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "2rem",
-              flex: 1,
-              justifyContent: "center",
-            }}
-            className="desktop-nav"
-          >
-            {navLinks.map((link) => {
-              const linkProps = {
-                style: {
-                  color: "#94a3b8",
-                  fontSize: "0.9375rem",
-                  fontWeight: 500,
-                  textDecoration: "none",
-                  transition: "color 0.2s ease",
-                  padding: "0.5rem 0.75rem",
-                  position: "relative" as const,
-                },
-                onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  e.currentTarget.style.color = "#ffffff";
-                },
-                onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  e.currentTarget.style.color = "#94a3b8";
-                },
-                onFocus: (e: React.FocusEvent<HTMLAnchorElement>) => {
-                  e.currentTarget.style.color = "#ffffff";
-                  e.currentTarget.style.outline = "2px solid #22d3ee";
-                  e.currentTarget.style.outlineOffset = "4px";
-                },
-                onBlur: (e: React.FocusEvent<HTMLAnchorElement>) => {
-                  e.currentTarget.style.color = "#94a3b8";
-                  e.currentTarget.style.outline = "none";
-                },
-              };
-
-              return link.isAnchor ? (
-                <a key={link.label} href={link.href} {...linkProps}>
-                  {link.label}
-                </a>
-              ) : (
-                <Link key={link.label} to={link.href} {...linkProps}>
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-1 lg:space-x-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className="text-slate-400 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 hover:bg-white/5"
+                >
                   {link.label}
                 </Link>
-              );
-            })}
-          </div>
+              ))}
+            </nav>
 
-          {/* Right - Actions (Desktop) */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1.5rem",
-            }}
-            className="desktop-actions"
-          >
-            <button
-              onClick={handleSubscribe}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#ffffff",
-                fontSize: "0.9375rem",
-                fontWeight: 500,
-                cursor: "pointer",
-                padding: "0.5rem 0.75rem",
-                transition: "color 0.2s ease",
-                whiteSpace: "nowrap",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#22d3ee";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#ffffff";
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.outline = "2px solid #22d3ee";
-                e.currentTarget.style.outlineOffset = "4px";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.outline = "none";
-              }}
-            >
-              Subscribe with USDC
-            </button>
-
-            {isConnected ? (
-              <WalletPill 
-                address={address} 
-                onDisconnect={handleDisconnect} 
-              />
-            ) : (
-              <button
-                onClick={handleConnectWallet}
-                style={{
-                  background: 'linear-gradient(90deg, #22d3ee 0%, #14b8a6 100%)',
-                  border: 'none',
-                  color: '#000000',
-                  fontSize: '0.9375rem',
-                  fontWeight: 600,
-                  padding: '0.75rem 1.75rem',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 20px rgba(34, 211, 238, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3)',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap',
-                  minHeight: '44px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)'
-                  e.currentTarget.style.boxShadow = '0 0 30px rgba(34, 211, 238, 0.6), 0 6px 16px rgba(0, 0, 0, 0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3)'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.outline = '2px solid #22d3ee'
-                  e.currentTarget.style.outlineOffset = '4px'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.outline = 'none'
-                }}
-              >
-                Connect wallet
-              </button>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            style={{
-              display: "none",
-              background: "transparent",
-              border: "none",
-              color: "#ffffff",
-              cursor: "pointer",
-              padding: "0.5rem",
-              minWidth: "44px",
-              minHeight: "44px",
-            }}
-            className="mobile-menu-button"
-            aria-label="Toggle menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+            {/* Actions */}
+            <div className="hidden md:flex items-center space-x-4">
+              {!isDashboard && (
+                <button
+                  onClick={handleSubscribe}
+                  className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                >
+                  Subscribe with USDC
+                </button>
               )}
-            </svg>
-          </button>
-        </nav>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div
-            style={{
-              background: "#0a0a0a",
-              borderTop: "1px solid #1a1a1a",
-              padding: "1.5rem",
-              display: "none",
-            }}
-            className="mobile-menu"
-          >
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              {navLinks.map((link) => {
-                const linkProps = {
-                  onClick: () => setIsMobileMenuOpen(false),
-                  style: {
-                    color: "#94a3b8",
-                    fontSize: "1rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    padding: "0.75rem",
-                    transition: "color 0.2s ease",
-                    minHeight: "44px",
-                    display: "flex" as const,
-                    alignItems: "center" as const,
-                  },
-                  onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.currentTarget.style.color = "#ffffff";
-                  },
-                  onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.currentTarget.style.color = "#94a3b8";
-                  },
-                };
-
-                return link.isAnchor ? (
-                  <a key={link.label} href={link.href} {...linkProps}>
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link key={link.label} to={link.href} {...linkProps}>
-                    {link.label}
-                  </Link>
-                );
-              })}
-
-              <div
-                style={{
-                  height: "1px",
-                  background: "#1a1a1a",
-                  margin: "0.5rem 0",
-                }}
-              />
-
-              <button
-                onClick={() => {
-                  handleSubscribe();
-                  setIsMobileMenuOpen(false);
-                }}
-                style={{
-                  background: "transparent",
-                  border: "1px solid #2a2a2a",
-                  color: "#ffffff",
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  transition: "all 0.2s ease",
-                  minHeight: "44px",
-                  textAlign: "left",
-                }}
-              >
-                Subscribe with USDC
-              </button>
-
+              
               {isConnected ? (
                 <WalletPill 
                   address={address} 
-                  onDisconnect={() => {
-                    handleDisconnect()
-                    setIsMobileMenuOpen(false)
-                  }} 
+                  onDisconnect={handleDisconnect} 
                 />
               ) : (
                 <button
-                  onClick={() => {
-                    handleConnectWallet()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  style={{
-                    background: 'linear-gradient(90deg, #22d3ee 0%, #14b8a6 100%)',
-                    border: 'none',
-                    color: '#ffffff',
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    padding: '0.75rem',
-                    borderRadius: '9999px',
-                    cursor: 'pointer',
-                    boxShadow: '0 0 20px rgba(34, 211, 238, 0.4)',
-                    minHeight: '44px'
-                  }}
+                  onClick={handleConnectWallet}
+                  className="bg-linear-to-r from-cyan-400 to-teal-500 hover:from-cyan-300 hover:to-teal-400 text-black px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all duration-300 hover:scale-105 active:scale-95"
                 >
                   Connect wallet
                 </button>
               )}
             </div>
+
+            {/* Mobile Menu Toggle */}
+            <div className="md:hidden flex items-center gap-3">
+              {isConnected && (
+                <div className="scale-90 origin-right">
+                   <WalletPill address={address} onDisconnect={handleDisconnect} />
+                </div>
+              )}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors border border-white/5"
+                aria-expanded={isMobileMenuOpen}
+                aria-label="Main menu"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* Mobile Menu Backdrop */}
+        {isMobileMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
         )}
 
-        <style>{`
-          @media (max-width: 768px) {
-            .desktop-nav,
-            .desktop-actions {
-              display: none !important;
-            }
-            .mobile-menu-button {
-              display: flex !important;
-              align-items: center;
-              justify-content: center;
-            }
-            .mobile-menu {
-              display: block !important;
-            }
-          }
-        `}</style>
+        {/* Mobile Menu Drawer */}
+        <div
+          className={`fixed inset-y-0 right-0 w-full max-w-xs bg-slate-950 border-l border-white/10 z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
+            isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-5 border-b border-white/5">
+              <Logo size="sm" />
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-6 px-5 space-y-1">
+              {!isDashboard ? (
+                <>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-3">Navigation</p>
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.label}
+                      to={link.href}
+                      className="flex items-center justify-between px-3 py-4 text-lg font-medium text-slate-300 hover:text-cyan-400 hover:bg-white/5 rounded-xl transition-all group"
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="text-slate-500 group-hover:text-cyan-400 transition-colors">
+                          {link.icon}
+                        </span>
+                        {link.label}
+                      </span>
+                      <ChevronRight size={18} className="text-slate-600 group-hover:text-cyan-400 transition-colors" />
+                    </Link>
+                  ))}
+                </>
+              ) : (
+                <div className="py-4 text-center">
+                  <p className="text-slate-500 text-sm italic">Authenticated Workspace</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-5 border-t border-white/5 space-y-4">
+              {!isDashboard && (
+                <button
+                  onClick={() => {
+                    handleSubscribe();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full py-4 px-6 text-center text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-medium transition-all"
+                >
+                  Subscribe with USDC
+                </button>
+              )}
+              
+              {!isConnected && (
+                <button
+                  onClick={() => {
+                    handleConnectWallet();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full py-4 px-6 text-center text-black bg-linear-to-r from-cyan-400 to-teal-500 hover:from-cyan-300 hover:to-teal-400 rounded-xl font-bold transition-all shadow-xl"
+                >
+                  Connect wallet
+                </button>
+              )}
+              
+              {isConnected && (
+                <button
+                  onClick={() => {
+                    handleDisconnect();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full py-4 px-6 text-center text-red-400 bg-red-400/5 hover:bg-red-400/10 border border-red-400/20 rounded-xl font-medium transition-all"
+                >
+                  Disconnect Wallet
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Wallet Connect Modal */}
