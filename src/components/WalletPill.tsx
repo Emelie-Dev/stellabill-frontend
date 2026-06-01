@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './WalletPill.module.css';
 import WalletDropdown from './WalletDropdown';
+import { ChevronDown, Globe } from 'lucide-react';
 
 interface WalletPillProps {
   address: string;
   onDisconnect: () => void;
+  network?: 'Mainnet' | 'Testnet';
 }
 
-const WalletPill: React.FC<WalletPillProps> = ({ address, onDisconnect }) => {
+const WalletPill: React.FC<WalletPillProps> = ({ address, onDisconnect, network = 'Testnet' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -41,21 +42,29 @@ const WalletPill: React.FC<WalletPillProps> = ({ address, onDisconnect }) => {
   }, [isOpen]);
 
   return (
-    <div className={styles.pillContainer} ref={containerRef}>
+    <div className="relative inline-block" ref={containerRef}>
       <button 
-        className={`${styles.pill} ${isOpen ? styles.pillOpen : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        className={`
+          flex items-center gap-3 px-4 py-2 rounded-2xl text-sm font-bold transition-all duration-300
+          ${isOpen 
+            ? "bg-white/10 ring-2 ring-cyan-500/30 text-white" 
+            : "bg-white/5 hover:bg-white/8 text-slate-300 hover:text-white border border-white/5 hover:border-white/10 shadow-sm"
+          }
+          cursor-pointer active:scale-95
+        `}
       >
-        <span className={styles.statusDot} />
-        <span>{truncatedAddress}</span>
-        <svg 
-          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+        {/* Network Indicator */}
+        <div className="flex items-center gap-1.5 px-1.5 py-1 bg-black/20 rounded-lg">
+           <span className={`w-2 h-2 rounded-full ${network === 'Mainnet' ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.5)]'}`} />
+           <Globe className="w-3 h-3 text-slate-500" />
+        </div>
+
+        <span className="tracking-tight">{truncatedAddress}</span>
+        
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <WalletDropdown 
