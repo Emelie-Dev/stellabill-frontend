@@ -85,4 +85,15 @@
   --radius-xl:   1rem;
   --radius-2xl:  1.5rem;
   --radius-full: 9999px;
+
+  /* Sidebar color tokens */
+  --sidebar-bg:              #1a1a2e;
+  --sidebar-width:           220px;
+  --sidebar-item-color:      #94a3b8;
+  --sidebar-item-color-hover:#e2e8f0;
+  --sidebar-item-active-bg:  #2d2d44;
+  --sidebar-item-active-color: #ffffff;
+  --sidebar-indicator-color: #6366f1;
+  --sidebar-group-label-color: #64748b;
+  --sidebar-focus-ring:      #6366f1;
 }

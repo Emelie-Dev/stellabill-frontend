@@ -1,17 +1,87 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import LandingNavbar from "./LandingNavbar";
+import "../styles/sidebar.css";
 
-const nav = [
-  { path: "/dashboard", label: "Dashboard" },
-  { path: "/subscriptions", label: "Subscriptions" },
-  { path: "/plans", label: "Plans" },
-  { path: "/browse-plans", label: "Browse Plans" },
-  { path: "/settings", label: "Settings" },
-  { path: "/ui-kit", label: "UI Kit (Mockups)" },
+const mainNav = [
+  {
+    path: "/dashboard",
+    label: "Dashboard",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+      </svg>
+    ),
+  },
+  {
+    path: "/subscriptions",
+    label: "Subscriptions",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      </svg>
+    ),
+  },
+  {
+    path: "/plans",
+    label: "Plans",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+    ),
+  },
+  {
+    path: "/browse-plans",
+    label: "Browse Plans",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+    ),
+  },
+  {
+    path: "/settings",
+    label: "Settings",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    ),
+  },
+];
+
+const devNav = [
+  {
+    path: "/ui-kit",
+    label: "UI Kit",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+      </svg>
+    ),
+  },
+  {
+    path: "/brand",
+    label: "Brand",
+    icon: (
+      <svg className="sb-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="4" />
+        <line x1="4.93" y1="4.93" x2="9.17" y2="9.17" /><line x1="14.83" y1="14.83" x2="19.07" y2="19.07" />
+        <line x1="14.83" y1="9.17" x2="19.07" y2="4.93" /><line x1="14.83" y1="9.17" x2="18.36" y2="5.64" />
+        <line x1="4.93" y1="19.07" x2="9.17" y2="14.83" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Layout() {
   const location = useLocation();
+
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
     <div
@@ -24,34 +94,39 @@ export default function Layout() {
     >
       <LandingNavbar />
       <div style={{ display: "flex", flex: 1 }}>
-        <aside
-          style={{
-            width: 220,
-            background: "#1a1a2e",
-            color: "#fff",
-            padding: "1.5rem 0",
-          }}
-        >
-          <div style={{ padding: "0 1rem", marginBottom: "1.5rem" }}>
-            <strong style={{ fontSize: "1.1rem" }}>Stellarbill</strong>
-          </div>
-          <nav>
-            {nav.map(({ path, label }) => (
-              <Link
-                key={path}
-                to={path}
-                style={{
-                  display: "block",
-                  padding: "0.5rem 1rem",
-                  color: location.pathname === path ? "#fff" : "#94a3b8",
-                  background:
-                    location.pathname === path ? "#2d2d44" : "transparent",
-                  textDecoration: "none",
-                }}
-              >
-                {label}
-              </Link>
-            ))}
+        <aside className="sb-sidebar" aria-label="Main navigation">
+          <div className="sb-sidebar__brand">Stellarbill</div>
+
+          <nav className="sb-sidebar__nav" aria-label="Primary">
+            <div className="sb-sidebar__group">
+              <p className="sb-sidebar__group-label" aria-hidden="true">Main</p>
+              {mainNav.map(({ path, label, icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className="sb-sidebar__link"
+                  aria-current={isActive(path) ? "page" : undefined}
+                >
+                  {icon}
+                  <span className="sb-sidebar__link-label">{label}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="sb-sidebar__group">
+              <p className="sb-sidebar__group-label" aria-hidden="true">Developer</p>
+              {devNav.map(({ path, label, icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className="sb-sidebar__link"
+                  aria-current={isActive(path) ? "page" : undefined}
+                >
+                  {icon}
+                  <span className="sb-sidebar__link-label">{label}</span>
+                </Link>
+              ))}
+            </div>
           </nav>
         </aside>
 
