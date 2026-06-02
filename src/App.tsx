@@ -22,7 +22,8 @@ function App() {
   return (
     <Routes>
       {/* 1. Public Routes (No Layout) */}
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/landing" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route
         path="/about-prepaid-balances"
@@ -53,8 +54,8 @@ function App() {
         <Route path="/brand" element={<BrandPack />} />
       </Route>
 
-      {/* 3. Catch-all — renders the 404 / not-found screen */}
-      <Route path="*" element={<NotFound />} />
+      {/* 3. Catch-all redirect - Sends users back to the dashboard for safety */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
