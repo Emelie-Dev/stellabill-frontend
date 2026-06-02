@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './WalletDropdown.module.css';
+import { Copy, ExternalLink, LogOut, Check, CreditCard } from 'lucide-react';
 
 interface WalletDropdownProps {
   isOpen: boolean;
@@ -9,19 +9,14 @@ interface WalletDropdownProps {
 }
 
 const WalletDropdown: React.FC<WalletDropdownProps> = ({ isOpen, address, onClose, onDisconnect }) => {
-  const [showToast, setShowToast] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(address);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
-  };
-
-  const handleSwitch = () => {
-    alert('Switch wallet flow triggered');
-    onClose();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDisconnect = () => {
@@ -30,47 +25,82 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ isOpen, address, onClos
   };
 
   return (
-    <>
-      <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
-        <span className={styles.label}>Connected wallet</span>
+    <div 
+      className="absolute right-0 mt-3 w-72 bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Connect Status</span>
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 rounded-full border border-green-500/20">
+             <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+             <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Connected</span>
+          </div>
+        </div>
         
-        <div className={styles.addressBox}>
-          {address}
+        <div className="bg-slate-950/50 rounded-2xl p-4 border border-white/5 mb-6 group relative">
+          <div className="text-[10px] font-medium text-slate-500 mb-1">Stellar Address</div>
+          <div className="text-xs font-mono text-slate-300 break-all leading-relaxed">
+            {address}
+          </div>
+          <button 
+            onClick={handleCopy}
+            className="absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition-all"
+            title="Copy address"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
         </div>
 
-        <div className={styles.actions}>
-          <button className={styles.actionItem} onClick={handleCopy}>
-            <svg className={styles.actionIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            Copy address
+        <div className="space-y-1">
+          <button 
+            className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all group"
+            onClick={() => window.open(`https://stellar.expert/explorer/public/account/${address}`, '_blank')}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-cyan-500/10 transition-colors">
+                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-cyan-400" />
+              </div>
+              View in Explorer
+            </div>
           </button>
 
-          <button className={styles.actionItem} onClick={handleSwitch}>
-            <svg className={styles.actionIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"></path>
-            </svg>
-            Switch wallet
+          <button 
+            className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all group opacity-50 cursor-not-allowed"
+            disabled
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-slate-800 rounded-lg">
+                <CreditCard className="w-4 h-4 text-slate-400" />
+              </div>
+              Wallet History
+            </div>
+            <span className="text-[10px] font-bold text-slate-600">SOON</span>
           </button>
 
-          <button className={`${styles.actionItem} ${styles.disconnect}`} onClick={handleDisconnect}>
-            <svg className={styles.disconnectIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            Disconnect
+          <div className="h-px bg-white/5 my-2" />
+
+          <button 
+            className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all group"
+            onClick={handleDisconnect}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-500/10 rounded-lg group-hover:bg-red-500/20 transition-colors">
+                <LogOut className="w-4 h-4" />
+              </div>
+              Disconnect
+            </div>
           </button>
         </div>
       </div>
-
-      {showToast && (
-        <div className={styles.toast}>
-          Address copied to clipboard!
+      
+      {/* Toast simplified */}
+      {copied && (
+        <div className="absolute bottom-0 left-0 right-0 py-2 bg-cyan-500 text-black text-[10px] font-bold text-center uppercase tracking-widest animate-in slide-in-from-bottom-full duration-300">
+          Copied to clipboard
         </div>
       )}
-    </>
+    </div>
   );
 };
 
