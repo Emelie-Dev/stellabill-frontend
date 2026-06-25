@@ -41,7 +41,10 @@ export default function Dashboard() {
       }
 
       setLoading(false);
-    }, 1000);
+    } catch (err: unknown) {
+      setError(err as Error);
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
