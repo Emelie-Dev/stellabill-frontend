@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import RecentPayments from '../components/RecentPayments';
 import UsageThisPeriod from '../components/UsageThisPeriod';
-import ResumeAffordance from '../components/ResumeAffordance';
+import PaymentFailedBanner from '../components/Dunning/PaymentFailedBanner';
 
 export default function SubscriptionDetail() {
     const { id } = useParams();
@@ -49,15 +49,20 @@ export default function SubscriptionDetail() {
                 <p style={{ color: '#64748b', margin: 0 }}>View details and recent payments for this subscription.</p>
             </div>
 
-            {/* Resume Affordance - Show when paused */}
-            {isPaused && (
-                <ResumeAffordance
-                    isPaused={isPaused}
-                    pauseUntilDate={pauseUntilDate}
-                    onResumeClick={handleResume}
-                    isLoading={isResuming}
-                />
-            )}
+            {/* Dunning banner - shown when there are failed attempts for this subscription */}
+            <PaymentFailedBanner
+                subscriptionId={id}
+                failedAttempts={1}
+                retrySchedule={[
+                    { id: 'r1', when: 'Mar 24 — Attempted', status: 'past' },
+                    { id: 'r2', when: 'Mar 26 — Next retry', status: 'upcoming' },
+                    { id: 'r3', when: 'Mar 30 — Final retry', status: 'upcoming' },
+                ]}
+                onFixPayment={() => {
+                    // Ideally route to payment method flow
+                    console.log('Open fix payment flow for subscription', id);
+                }}
+            />
 
             {/* Usage This Period Section - Only for usage-based subscriptions */}
             {isUsageBased && (
