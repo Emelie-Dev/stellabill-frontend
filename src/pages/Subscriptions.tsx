@@ -277,57 +277,23 @@ export default function Subscriptions() {
 	const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 	const [isActionLoading, setIsActionLoading] = useState(false);
 
-	// Tag management state
-	const [availableTags] = useState<TagOption[]>([
-		{ id: 't1', label: 'Premium', color: 'blue' },
-		{ id: 't2', label: 'Trial', color: 'yellow' },
-		{ id: 't3', label: 'VIP', color: 'purple' },
-	]);
-
-	const handleAddTag = (subId: string, tag: TagOption) => {
-		setData(prev => prev.map(sub => 
-			sub.id === subId 
-				? { ...sub, tags: [...(sub.tags || []), tag] }
-				: sub
-		));
-	};
-
-	const handleRemoveTag = (subId: string, tagId: string) => {
-		setData(prev => prev.map(sub =>
-			sub.id === subId
-				? { ...sub, tags: (sub.tags || []).filter(t => t.id !== tagId) }
-				: sub
-		));
-	};
-
-	const handleCreateTag = (label: string, color: TagOption['color']) => {
-		// In a real app, this would call an API
-		console.log('Create tag:', label, color);
-	};
-
-	const fetchSubscriptions = useCallback(async () => {
+	const fetchSubscriptions = useCallback(() => {
 		setLoading(true);
 		setError(null);
-		try {
-			await new Promise<void>((resolve, reject) => {
-				setTimeout(() => {
-					if (window.location.search.includes("simulate_error")) {
-						const err: ApiError = new Error("Failed to load subscriptions");
-						err.status = 500;
-						err.technicalDetails =
-							"The subscription service returned a malformed response. [Error Code: SUB-FETCH-ERR]";
-						reject(err);
-					} else {
-						resolve();
-					}
-				}, 1000);
-			});
-			setData(INITIAL_DATA);
+
+		window.setTimeout(() => {
+			if (window.location.search.includes("simulate_error")) {
+				const err: ApiError = new Error("Failed to load subscriptions");
+				err.status = 500;
+				err.technicalDetails =
+					"The subscription service returned a malformed response. [Error Code: SUB-FETCH-ERR]";
+				setError(err);
+			} else {
+				setData(INITIAL_DATA);
+			}
+
 			setLoading(false);
-		} catch (err: any) {
-			setError(err);
-			setLoading(false);
-		}
+		}, 1000);
 	}, []);
 
 	useEffect(() => {
@@ -858,8 +824,8 @@ export default function Subscriptions() {
 											e.stopPropagation();
 											setSelectedId(sub.id);
 										}}
-										aria-label={`Manage ${sub.planName}`}>
-										{t('subscriptions.table.manage')}
+										aria-label={`Open ${sub.planName} from card`}>
+										Manage
 									</button>
 								</div>
 							</article>

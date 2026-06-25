@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import Tag from "../components/Tag";
-import AddTagPopover, { TagOption } from "../components/AddTagPopover";
+import { useState } from "react";
 
 interface Plan {
   id: string;
@@ -135,7 +133,7 @@ export default function PlansList({
           </thead>
 
           <tbody>
-            {plans.map((p, i) => (
+            {plans.map((p) => (
               <tr key={p.id}>
                 <td>
                   <input

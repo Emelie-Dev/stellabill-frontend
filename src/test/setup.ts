@@ -22,4 +22,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
+
+// Legacy Jest-style tests in this repository use the jest namespace.
+(globalThis as any).jest = vi
