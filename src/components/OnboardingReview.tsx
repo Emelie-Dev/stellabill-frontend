@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OnboardingShell from './Onboarding/OnboardingShell';
 import './Onboarding/OnboardingShell.css';
@@ -27,6 +27,7 @@ export default function OnboardingReview() {
       } catch {
         setBusinessName('');
         setWebsite('');
+        setCountry('');
       }
     }
 
@@ -50,6 +51,19 @@ export default function OnboardingReview() {
     setLoading(false);
     navigate('/onboarding-success');
   };
+
+  const displayNames = useMemo(() => {
+    try {
+      return new Intl.DisplayNames('en', { type: 'region' });
+    } catch {
+      return undefined;
+    }
+  }, []);
+
+  const countryLabel = useMemo(
+    () => (country ? displayNames?.of(country) ?? country : 'No country selected'),
+    [country, displayNames]
+  );
 
   const truncateAddress = (address: string) => {
     if (!address) return 'No payout address provided';
@@ -84,7 +98,7 @@ export default function OnboardingReview() {
 
       <div className="onboarding-field">
         <label className="onboarding-label">Country</label>
-        <div className="onboarding-readonly">{country ? getCountryName(country) : 'No country selected'}</div>
+        <div className="onboarding-readonly">{countryLabel}</div>
       </div>
 
       <div className="onboarding-field">

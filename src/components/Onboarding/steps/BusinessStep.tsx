@@ -13,25 +13,33 @@ export default function BusinessStep({ onNext }: BusinessStepProps) {
   const [website, setWebsite] = useState('');
   const [country, setCountry] = useState('');
   const [logo, setLogo] = useState<File | null>(null);
-  const [error, setError] = useState('');
+  const [country, setCountry] = useState('');
+  const [businessError, setBusinessError] = useState('');
   const [countryError, setCountryError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleNext = () => {
-    if (!businessName.trim()) {
-      setError('Business name is required.');
-      return;
+    const trimmedName = businessName.trim();
+    const hasCountry = !!country;
+
+    if (!trimmedName) {
+      setBusinessError('Business name is required.');
+    } else {
+      setBusinessError('');
     }
 
-    if (!country) {
+    if (!hasCountry) {
       setCountryError('Country is required.');
+    } else {
+      setCountryError('');
+    }
+
+    if (!trimmedName || !hasCountry) {
       return;
     }
 
-    setError('');
-    setCountryError('');
     onNext?.({
-      businessName: businessName.trim(),
+      businessName: trimmedName,
       website: website.trim(),
       logo,
       country,
@@ -40,7 +48,7 @@ export default function BusinessStep({ onNext }: BusinessStepProps) {
 
   const nameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBusinessName(e.target.value);
-    if (error) setError('');
+    if (businessError) setBusinessError('');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,19 +66,33 @@ export default function BusinessStep({ onNext }: BusinessStepProps) {
         <input
           id="business-name"
           type="text"
-          className={`onboarding-input${error ? ' onboarding-input--error' : ''}`}
+          className={`onboarding-input${businessError ? ' onboarding-input--error' : ''}`}
           value={businessName}
           onChange={nameChange}
           placeholder="Acme Inc."
           aria-required="true"
-          aria-invalid={!!error}
-          aria-describedby={error ? 'business-error' : undefined}
+          aria-invalid={!!businessError}
+          aria-describedby={businessError ? 'business-error' : undefined}
         />
-        {error && (
+        {businessError && (
           <p id="business-error" className="onboarding-error" role="alert">
-            {error}
+            {businessError}
           </p>
         )}
+      </div>
+
+      <div className="onboarding-field">
+        <CountryRegionPicker
+          value={country}
+          onChange={(code) => {
+            setCountry(code)
+            if (countryError) setCountryError('')
+          }}
+          label="Country / Region"
+          placeholder="Search for a country"
+          helperText="Search for the country where your business is registered."
+          errorMessage={countryError}
+        />
       </div>
 
       <div className="onboarding-field">
