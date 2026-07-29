@@ -8,8 +8,9 @@ import {
 import { PastPeriods } from '../components/past-periods/past-periods';
 import ReceiptPreview from '../components/past-periods/ReceiptPreview';
 import type { ReceiptData } from '../components/past-periods/ReceiptPreview';
+import { useScopedTheme } from '../hooks/useScopedTheme';
 import './UsageBilling.css';
-import InvoiceList, { Invoice } from "../components/InvoiceList";
+import InvoiceList from "../components/InvoiceList";
 
 
 interface UsageData {
@@ -112,74 +113,33 @@ export default function UsageBilling() {
     const usageCountFmt = usageCount.toLocaleString();
     const usageLimitFmt = usageLimit.toLocaleString();
 
-    const invoicesData = [
+    const invoicesData: {
+        id: string;
+        date: string;
+        status: "paid" | "pending" | "failed";
+        total: string;
+        currency: string;
+    }[] = [
     {
         id: "INV-00123456789",
-        type: "invoice",
         date: "Mar 31, 2026",
-        status: "paid" as const,
+        status: "paid",
         total: "16.23",
         currency: "USDC",
-        lineItems: [
-            { description: `API usage (${unit}) for ${billingPeriod}`, quantity: usageCount, unitPrice: "0.0005", lineTotal: "15.20" },
-            { description: "Usage adjustment / rounding", quantity: 1, unitPrice: "1.03", lineTotal: "1.03" },
-        ],
-        subtotal: "16.23",
-        taxes: [
-            { label: "Network / protocol fee", amount: "0.00" },
-        ],
-    },
-    {
-        id: "CN-00000000001",
-        type: "credit_note",
-        date: "Mar 15, 2026",
-        status: "adjusted",
-        total: "5.00",
-        currency: "USDC",
-        parentInvoiceId: "INV-00123456790",
-        reason: "Partial refund for downtime",
-        amountRedeemed: "2.50",
-    },
-    {
-        id: "CN-00000000002",
-        type: "credit_note",
-        date: "Feb 10, 2026",
-        status: "refunded",
-        total: "10.00",
-        currency: "USDC",
-        reason: "Goodwill credit",
     },
     {
         id: "INV-00123456790",
-        type: "invoice",
         date: "Feb 28, 2026",
-        status: "pending" as const,
+        status: "pending",
         total: "12.10",
         currency: "USDC",
-        lineItems: [
-            { description: `API usage (${unit}) for Feb 2026`, quantity: 22000, unitPrice: "0.0005", lineTotal: "11.00" },
-            { description: "Usage adjustment / rounding", quantity: 1, unitPrice: "1.10", lineTotal: "1.10" },
-        ],
-        subtotal: "12.10",
-        taxes: [
-            { label: "Network / protocol fee", amount: "0.00" },
-        ],
     },
     {
         id: "INV-00123456791",
-        type: "invoice",
         date: "Jan 31, 2026",
-        status: "failed" as const,
+        status: "failed",
         total: "8.50",
         currency: "USDC",
-        lineItems: [
-            { description: `API usage (${unit}) for Jan 2026`, quantity: 15000, unitPrice: "0.0005", lineTotal: "7.50" },
-            { description: "Usage adjustment / rounding", quantity: 1, unitPrice: "1.00", lineTotal: "1.00" },
-        ],
-        subtotal: "8.50",
-        taxes: [
-            { label: "Network / protocol fee", amount: "0.00" },
-        ],
     },
     ];
 
@@ -406,6 +366,10 @@ function fmtSigned(value: number, currency: string): string {
 function StatementOfAccount() {
   const headingId = useId();
 
+  // Force light theme on the statement section so that PDF/print output
+  // always renders with a white background regardless of global preference.
+  const sectionRef = useScopedTheme<HTMLElement>('light');
+
   // ── Filters ──────────────────────────────────────────────────────────────
   const [dateStart, setDateStart] = useState('2026-01-01');
   const [dateEnd, setDateEnd] = useState('2026-12-31');
@@ -453,7 +417,7 @@ function StatementOfAccount() {
   }, []);
 
   return (
-    <section className="statement-section" aria-labelledby={headingId} style={{ marginTop: 32 }}>
+    <section ref={sectionRef} className="statement-section" aria-labelledby={headingId} style={{ marginTop: 32 }}>
       <div className="main-card">
         <div className="main-card-inner">
           <h2 id={headingId} className="statement-heading">Statement of Account</h2>
