@@ -7,6 +7,7 @@ import PlanStatusTimeline from '../components/PlanStatusTimeline';
 import ScheduleChangePreview, { type BillingInterval } from '../components/ScheduleChangePreview';
 import ReactivationModal, { type ReactivationPlan } from '../components/ReactivationModal';
 import DowngradeConfirmModal, { type PlanFeature } from '../components/DowngradeConfirmModal';
+import TrialCountdownBanner from '../components/TrialCountdownBanner';
 
 // ── Mock subscription status type ────────────────────────────────────────────
 type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
@@ -27,23 +28,32 @@ export default function SubscriptionDetail() {
     const [isReactivationModalOpen, setIsReactivationModalOpen] = useState(false);
     const [isReactivating, setIsReactivating] = useState(false);
 
+    // ── Trial banner mock data ────────────────────────────────────────────────
+    // Set this to a real trial end date from the API. Adjust the offset to test
+    // different urgency tiers:
+    //   +10 days → info (blue)
+    //   +5 days  → warning (amber)
+    //   +1 day   → urgent (red)
+    //   today    → expired (red)
+    const trialEndsAt = new Date();
+    trialEndsAt.setDate(trialEndsAt.getDate() + 2); // <3 days → urgent tier
+    const isTrialSubscription = true; // replace with real flag from API
+
     // ── Downgrade state ───────────────────────────────────────────────────────
     const [isDowngradeModalOpen, setIsDowngradeModalOpen] = useState(false);
     const [isDowngrading, setIsDowngrading] = useState(false);
 
-    // Mock: features lost when downgrading from Pro → Basic
     const downgradeLostFeatures: PlanFeature[] = [
-        { id: 'api-calls', label: 'Unlimited API calls (limited to 10k/mo on Basic)' },
-        { id: 'priority-support', label: 'Priority support' },
-        { id: 'advanced-analytics', label: 'Advanced analytics dashboard' },
-        { id: 'custom-webhooks', label: 'Custom webhooks' },
+        { id: 'api-calls',   label: 'Unlimited API calls (limited to 10k/mo on Basic)' },
+        { id: 'support',     label: 'Priority support' },
+        { id: 'analytics',   label: 'Advanced analytics dashboard' },
+        { id: 'webhooks',    label: 'Custom webhooks' },
     ];
 
     const handleDowngradeConfirm = async () => {
         setIsDowngrading(true);
         try {
             console.log('Downgrading subscription', id, 'to Basic plan');
-            // TODO: await api.subscriptions.changePlan(id, { planId: 'basic' })
             await new Promise(resolve => setTimeout(resolve, 1200));
             setIsDowngradeModalOpen(false);
         } catch (err) {
@@ -253,6 +263,15 @@ export default function SubscriptionDetail() {
                     </div>
                 )}
             </div>
+
+            {/* ── Trial countdown banner ────────────────────────────────────── */}
+            {isTrialSubscription && (
+                <TrialCountdownBanner
+                    trialEndsAt={trialEndsAt}
+                    upgradeHref="/plans"
+                    onUpgrade={() => console.log('Upgrade clicked from trial banner')}
+                />
+            )}
 
             {/* ── Dunning banner ────────────────────────────────────────────── */}
             <PaymentFailedBanner
