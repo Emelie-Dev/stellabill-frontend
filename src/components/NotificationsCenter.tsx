@@ -16,8 +16,9 @@ import {
   VolumeX,
   WalletCards,
   X,
-} from "lucide-react";
-import "./NotificationsCenter.css";
+} from 'lucide-react';
+import { useRefresh } from '../hooks/useRefresh';
+import './NotificationsCenter.css';
 
 // ---------------------------------------------------------------------------
 // Types
